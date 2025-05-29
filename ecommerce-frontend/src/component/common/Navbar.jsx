@@ -31,30 +31,34 @@ const Navbar = () =>{
         }
     }
 
-    return(
-        <nav className="navbar">
-            <div className="navbar-brand">
-                <NavLink to="/" > <img src="./phegon_mart.png" alt="Phegon Mart" /></NavLink>
-            </div>
-            {/* SEARCH FORM */}
-            <form className="navbar-search" onSubmit={handleSearchSubmit}>
-                <input type="text" 
-                placeholder="Search products" 
-                value={searchValue}
-                onChange={handleSearchChange} />
-                <button type="submit">Search</button>
-            </form>
+    return (
+      <nav className="navbar">
+        <div className="navbar-brand">
+          <NavLink to="/" className="brand-text">
+            Ecom-Store
+          </NavLink>
+        </div>
+        {/* SEARCH FORM */}
+        <form className="navbar-search" onSubmit={handleSearchSubmit}>
+          <input
+            type="text"
+            placeholder="Search products"
+            value={searchValue}
+            onChange={handleSearchChange}
+          />
+          <button type="submit">Search</button>
+        </form>
 
-            <div className="navbar-link">
-                <NavLink to="/" >Home</NavLink>
-                <NavLink to="/categories" >Categories</NavLink>
-                {isAuthenticated && <NavLink to="/profile" >My Account</NavLink>}
-                {isAdmin && <NavLink to="/admin" >Admin</NavLink>}
-                {!isAuthenticated && <NavLink to="/login" >Login</NavLink>}
-                {isAuthenticated &&<NavLink onClick={handleLogout} >Logout</NavLink>}
-                <NavLink to="/cart">Cart</NavLink>
-            </div>
-        </nav>
+        <div className="navbar-link">
+          <NavLink to="/">Home</NavLink>
+          <NavLink to="/categories">Categories</NavLink>
+          {isAuthenticated && <NavLink to="/profile">My Account</NavLink>}
+          {isAdmin && <NavLink to="/admin">Admin</NavLink>}
+          {!isAuthenticated && <NavLink to="/login">Login</NavLink>}
+          {isAuthenticated && <NavLink onClick={handleLogout}>Logout</NavLink>}
+          <NavLink to="/cart">Cart</NavLink>
+        </div>
+      </nav>
     );
 
 };
