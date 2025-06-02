@@ -42,31 +42,4 @@ public class AddressServiceImpl implements AddressService {
                 .build();
     }
 
-    @Override
-    public Response deleteAddressById(Long addressId) {
-        Address address = addressRepo.findById(addressId).orElse(null);
-
-        if (address == null) {
-            return Response.builder()
-                    .status(404)
-                    .message("Address not found")
-                    .build();
-        }
-
-        // Optionally restrict deletion to only the logged-in user
-        User user = userService.getLoginUser();
-        if (!address.getUser().getId().equals(user.getId())) {
-            return Response.builder()
-                    .status(403)
-                    .message("You are not authorized to delete this address")
-                    .build();
-        }
-
-        addressRepo.delete(address);
-        return Response.builder()
-                .status(200)
-                .message("Address deleted successfully")
-                .build();
-    }
-
 }

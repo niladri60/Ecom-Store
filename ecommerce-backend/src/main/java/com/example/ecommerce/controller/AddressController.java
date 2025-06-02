@@ -17,9 +17,4 @@ public class AddressController {
     public ResponseEntity<Response> saveAndUpdateAddress(@RequestBody AddressDto addressDto) {
         return ResponseEntity.ok(addressService.saveAndUpdateAddress(addressDto));
     }
-
-    @DeleteMapping("/delete/{id}")
-    public ResponseEntity<Response> deleteAddressById(@PathVariable("id") Long id) {
-        return ResponseEntity.ok(addressService.deleteAddressById(id));
-    }
 }
