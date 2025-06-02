@@ -52,7 +52,6 @@ Ecom-Store is a modern fullstack e-commerce platform featuring:
 | ---------------- | ------------------------------------ |
 | Framework        | React 18 (Vite)                      |
 | Styling          | Tailwind CSS                         |
-| State Management | Redux Toolkit                        |
 | Routing          | React Router 6                       |
 | Testing          | Jest, React Testing Library, Cypress |
 | HTTP Client      | Axios                                |
@@ -271,7 +270,6 @@ ecom-store/
 * 📜 Order History
 * 🔍 Product Search/Filter
 * 🛠 Admin Dashboard
-* 🌒 Dark/Light Theme Toggle
 * 📤 Image Upload
 
 
