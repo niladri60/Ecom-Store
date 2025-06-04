@@ -32,67 +32,61 @@ import java.util.stream.Collectors;
 @Slf4j
 public class OrderItemServiceImpl implements OrderItemService {
 
-
     private final OrderRepo orderRepo;
     private final OrderItemRepo orderItemRepo;
     private final ProductRepo productRepo;
     private final UserService userService;
     private final EntityDtoMapper entityDtoMapper;
 
-
     @Override
     public Response placeOrder(OrderRequest orderRequest) {
 
         User user = userService.getLoginUser();
-        //map order request items to order entities
 
         List<OrderItem> orderItems = orderRequest.getItems().stream().map(orderItemRequest -> {
             Product product = productRepo.findById(orderItemRequest.getProductId())
-                    .orElseThrow(()-> new NotFoundException("Product Not Found"));
+                    .orElseThrow(() -> new NotFoundException("Product Not Found"));
 
             OrderItem orderItem = new OrderItem();
             orderItem.setProduct(product);
             orderItem.setQuantity(orderItemRequest.getQuantity());
-            orderItem.setPrice(product.getPrice().multiply(BigDecimal.valueOf(orderItemRequest.getQuantity()))); //set price according to the quantity
+            orderItem.setPrice(product.getPrice().multiply(BigDecimal.valueOf(orderItemRequest.getQuantity())));
             orderItem.setStatus(OrderStatus.PENDING);
             orderItem.setUser(user);
             return orderItem;
 
         }).collect(Collectors.toList());
 
-        //calculate the total price
         BigDecimal totalPrice = orderRequest.getTotalPrice() != null && orderRequest.getTotalPrice().compareTo(BigDecimal.ZERO) > 0
                 ? orderRequest.getTotalPrice()
                 : orderItems.stream().map(OrderItem::getPrice).reduce(BigDecimal.ZERO, BigDecimal::add);
 
-        //create order entity
         Order order = new Order();
         order.setOrderItemList(orderItems);
         order.setTotalPrice(totalPrice);
 
-        //set the order reference in each orderitem
         orderItems.forEach(orderItem -> orderItem.setOrder(order));
 
         orderRepo.save(order);
 
-        return Response.builder()
-                .status(200)
-                .message("Order was successfully placed")
-                .build();
-
+        Response response = new Response();
+        response.setStatus(200);
+        response.setMessage("Order was successfully placed");
+        return response;
     }
 
     @Override
     public Response updateOrderItemStatus(Long orderItemId, String status) {
         OrderItem orderItem = orderItemRepo.findById(orderItemId)
-                .orElseThrow(()-> new NotFoundException("Order Item not found"));
+                .orElseThrow(() -> new NotFoundException("Order Item not found"));
 
         orderItem.setStatus(OrderStatus.valueOf(status.toUpperCase()));
         orderItemRepo.save(orderItem);
-        return Response.builder()
-                .status(200)
-                .message("Order status updated successfully")
-                .build();
+
+        Response response = new Response();
+        response.setStatus(200);
+        response.setMessage("Order status updated successfully");
+        return response;
     }
 
     @Override
@@ -113,7 +107,7 @@ public class OrderItemServiceImpl implements OrderItemService {
                     : spec.and(OrderItemSpecification.hasItemId(itemId)));
         }
 
-        Page<OrderItem> orderItemPage = orderItemRepo.findAll(spec, (org.springframework.data.domain.Pageable) pageable);
+        Page<OrderItem> orderItemPage = orderItemRepo.findAll(spec, pageable);
 
         if (orderItemPage.isEmpty()) {
             throw new NotFoundException("No Order Found");
@@ -123,13 +117,11 @@ public class OrderItemServiceImpl implements OrderItemService {
                 .map(entityDtoMapper::mapOrderItemToDtoPlusProductAndUser)
                 .collect(Collectors.toList());
 
-        return Response.builder()
-                .status(200)
-                .orderItemList(orderItemDtos)
-                .totalPage(orderItemPage.getTotalPages())
-                .totalElement(orderItemPage.getTotalElements())
-                .build();
+        Response response = new Response();
+        response.setStatus(200);
+        response.setOrderItemList(orderItemDtos);
+        response.setTotalPage(orderItemPage.getTotalPages());
+        response.setTotalElement(orderItemPage.getTotalElements());
+        return response;
     }
-
-
 }

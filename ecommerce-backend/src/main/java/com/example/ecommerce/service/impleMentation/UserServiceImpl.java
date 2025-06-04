@@ -18,7 +18,6 @@ import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
-
 import java.util.List;
 
 @Service
@@ -26,41 +25,36 @@ import java.util.List;
 @RequiredArgsConstructor
 public class UserServiceImpl implements UserService {
 
-
     private final UserRepo userRepo;
     private final PasswordEncoder passwordEncoder;
     private final JwtUtils jwtUtils;
     private final EntityDtoMapper entityDtoMapper;
 
-
     @Override
     public Response registerUser(UserDto registrationRequest) {
         UserRoles role = UserRoles.USER;
-
         if (registrationRequest.getRole() != null && registrationRequest.getRole().equalsIgnoreCase("admin")) {
             role = UserRoles.ADMIN;
         }
 
-        User user = User.builder()
-                .name(registrationRequest.getName())
-                .email(registrationRequest.getEmail())
-                .password(passwordEncoder.encode(registrationRequest.getPassword()))
-                .phoneNumber(registrationRequest.getPhoneNumber())
-                .role(role)
-                .build();
+        User user = new User();
+        user.setName(registrationRequest.getName());
+        user.setEmail(registrationRequest.getEmail());
+        user.setPassword(passwordEncoder.encode(registrationRequest.getPassword()));
+        user.setPhoneNumber(registrationRequest.getPhoneNumber());
+        user.setRole(role);
 
         User savedUser = userRepo.save(user);
         System.out.println(savedUser);
 
         UserDto userDto = entityDtoMapper.mapUserToDtoBasic(savedUser);
-        return Response.builder()
-                .status(200)
-                .message("User Successfully Added")
-                .user(userDto)
-                .build();
+
+        Response response = new Response();
+        response.setStatus(200);
+        response.setMessage("User Successfully Added");
+        response.setUser(userDto);
+        return response;
     }
-
-
 
     @Override
     public Response loginUser(LoginRequest loginRequest) {
@@ -73,36 +67,26 @@ public class UserServiceImpl implements UserService {
 
         String token = jwtUtils.generateToken(user);
 
-        return Response.builder()
-                .status(200)
-                .message("User Successfully Logged In")
-                .token(token)
-                .expirationTime("6 Month")
-                .role(user.getRole().name())
-                .build();
+        Response response = new Response();
+        response.setStatus(200);
+        response.setMessage("User Successfully Logged In");
+        response.setToken(token);
+        response.setExpirationTime("6 Month");
+        response.setRole(user.getRole().name());
+        return response;
     }
 
     @Override
     public Response getAllUsers() {
-
         List<User> users = userRepo.findAll();
         List<UserDto> userDtos = users.stream()
                 .map(entityDtoMapper::mapUserToDtoBasic)
                 .toList();
 
-        return Response.builder()
-                .status(200)
-                .userList(userDtos)
-                .build();
-    }
-
-    @Override
-    public User getLoginUser() {
-        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
-        String  email = authentication.getName();
-        log.info("User Email is: {}", email);
-        return userRepo.findByEmail(email)
-                .orElseThrow(()-> new UsernameNotFoundException("User Not found"));
+        Response response = new Response();
+        response.setStatus(200);
+        response.setUserList(userDtos);
+        return response;
     }
 
     @Override
@@ -110,9 +94,18 @@ public class UserServiceImpl implements UserService {
         User user = getLoginUser();
         UserDto userDto = entityDtoMapper.mapUserToDtoPlusAddressAndOrderHistory(user);
 
-        return Response.builder()
-                .status(200)
-                .user(userDto)
-                .build();
+        Response response = new Response();
+        response.setStatus(200);
+        response.setUser(userDto);
+        return response;
+    }
+
+    @Override
+    public User getLoginUser() {
+        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+        String email = authentication.getName();
+        log.info("User Email is: {}", email);
+        return userRepo.findByEmail(email)
+                .orElseThrow(() -> new UsernameNotFoundException("User Not found"));
     }
 }

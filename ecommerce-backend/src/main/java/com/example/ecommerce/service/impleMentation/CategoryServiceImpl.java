@@ -26,21 +26,24 @@ public class CategoryServiceImpl implements CategoryService {
         Category category = new Category();
         category.setName(categoryRequest.getName());
         categoryRepo.save(category);
-        return Response.builder()
-                .status(200)
-                .message("Category created successfully")
-                .build();
+
+        Response response = new Response();
+        response.setStatus(200);
+        response.setMessage("Category created successfully");
+        return response;
     }
 
     @Override
     public Response updateCategory(Long categoryId, CategoryDto categoryRequest) {
-        Category category = categoryRepo.findById(categoryId).orElseThrow(()-> new NotFoundException("Category Not Found"));
+        Category category = categoryRepo.findById(categoryId)
+                .orElseThrow(() -> new NotFoundException("Category Not Found"));
         category.setName(categoryRequest.getName());
         categoryRepo.save(category);
-        return Response.builder()
-                .status(200)
-                .message("category updated successfully")
-                .build();
+
+        Response response = new Response();
+        response.setStatus(200);
+        response.setMessage("Category updated successfully");
+        return response;
     }
 
     @Override
@@ -50,29 +53,33 @@ public class CategoryServiceImpl implements CategoryService {
                 .map(entityDtoMapper::mapCategoryToDtoBasic)
                 .collect(Collectors.toList());
 
-        return  Response.builder()
-                .status(200)
-                .categoryList(categoryDtoList)
-                .build();
+        Response response = new Response();
+        response.setStatus(200);
+        response.setCategoryList(categoryDtoList);
+        return response;
     }
 
     @Override
     public Response getCategoryById(Long categoryId) {
-        Category category = categoryRepo.findById(categoryId).orElseThrow(()-> new NotFoundException("Category Not Found"));
+        Category category = categoryRepo.findById(categoryId)
+                .orElseThrow(() -> new NotFoundException("Category Not Found"));
         CategoryDto categoryDto = entityDtoMapper.mapCategoryToDtoBasic(category);
-        return Response.builder()
-                .status(200)
-                .category(categoryDto)
-                .build();
+
+        Response response = new Response();
+        response.setStatus(200);
+        response.setCategory(categoryDto);
+        return response;
     }
 
     @Override
     public Response deleteCategory(Long categoryId) {
-        Category category = categoryRepo.findById(categoryId).orElseThrow(()-> new NotFoundException("Category Not Found"));
+        Category category = categoryRepo.findById(categoryId)
+                .orElseThrow(() -> new NotFoundException("Category Not Found"));
         categoryRepo.delete(category);
-        return Response.builder()
-                .status(200)
-                .message("Category was deleted successfully")
-                .build();
+
+        Response response = new Response();
+        response.setStatus(200);
+        response.setMessage("Category was deleted successfully");
+        return response;
     }
 }
