@@ -1,7 +1,6 @@
 package com.example.ecommerce.security;
 
 import com.example.ecommerce.entity.User;
-import lombok.Builder;
 import lombok.Data;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
@@ -10,10 +9,12 @@ import java.util.Collection;
 import java.util.List;
 
 @Data
-@Builder
 public class AuthUser implements UserDetails {
 
     private User user;
+    public AuthUser(User user) {
+        this.user = user;
+    }
     @Override
     public Collection<? extends GrantedAuthority> getAuthorities() {
         return List.of(new SimpleGrantedAuthority(user.getRole().name()));
