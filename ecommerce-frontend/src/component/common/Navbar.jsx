@@ -17,8 +17,11 @@ const Navbar = () => {
 
   const handleSearchSubmit = (e) => {
     e.preventDefault();
-    navigate(`/?search=${searchValue}`);
+    if (searchValue.trim()) {
+      navigate(`/products?search=${encodeURIComponent(searchValue.trim())}`);
+    }
   };
+
 
   const handleLogout = () => {
     const confirmLogout = window.confirm("Are you sure you want to logout?");
